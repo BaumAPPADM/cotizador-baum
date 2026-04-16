@@ -281,19 +281,34 @@
   <h1>Generador de Cotizaciones</h1>
   <p class="subtitle">CYG Riego SPA — Baumsystem Control y Gestión de Riego</p>
 
-  <!-- UF -->
-  <div class="uf-display">
-    <div>
-      <div class="uf-label">Valor UF del día</div>
-      <div class="uf-value" id="ufValue">Cargando...</div>
+  <!-- Indicadores económicos -->
+  <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+    <div class="uf-display" style="flex:1; min-width:200px;">
+      <div>
+        <div class="uf-label">Valor UF del día</div>
+        <div class="uf-value" id="ufValue">Cargando...</div>
+      </div>
+      <span class="uf-status loading" id="ufStatus">Consultando...</span>
+      <div class="uf-date" id="ufDate"></div>
     </div>
-    <span class="uf-status loading" id="ufStatus">Consultando...</span>
-    <div class="uf-date" id="ufDate"></div>
+    <div class="uf-display" style="flex:1; min-width:200px;">
+      <div>
+        <div class="uf-label">Valor USD del día</div>
+        <div class="uf-value" id="usdValue">Cargando...</div>
+      </div>
+      <span class="uf-status loading" id="usdStatus">Consultando...</span>
+      <div class="uf-date" id="usdDate"></div>
+    </div>
   </div>
-  <div class="manual-uf" id="manualUfBox" style="display:none; margin-bottom: 16px;">
+  <div class="manual-uf" id="manualUfBox" style="display:none; margin-bottom: 8px;">
     <span style="font-size:13px; color:#666;">Ingresar UF manual:</span>
     <input type="number" id="manualUfInput" step="0.01" placeholder="Ej: 39934.00">
     <button onclick="setManualUf()">Usar este valor</button>
+  </div>
+  <div class="manual-uf" id="manualUsdBox" style="display:none; margin-bottom: 16px;">
+    <span style="font-size:13px; color:#666;">Ingresar USD manual:</span>
+    <input type="number" id="manualUsdInput" step="0.01" placeholder="Ej: 950.00">
+    <button onclick="setManualUsd()">Usar este valor</button>
   </div>
 
   <!-- ========== CALCULADORA DE TARIFAS ========== -->
@@ -317,12 +332,28 @@
           <span class="lev-info">Se aplica a todos los campos</span>
         </div>
 
-        <!-- USD/CLP solo para BaumApp -->
+        <!-- Opciones BaumApp -->
         <div id="baumappConfig" style="display:none; margin-top: 12px;">
           <div class="tariff-lev-row">
             <label>Tipo de cambio USD/CLP:</label>
             <input type="number" id="tariffUsdClp" value="950" style="width:110px;" oninput="updateTariffPreview()">
-            <span class="lev-info">Se usa para convertir USD a CLP</span>
+            <span class="lev-info">Automático desde mindicador.cl</span>
+          </div>
+          <div class="tariff-lev-row" style="margin-top:8px;">
+            <label>Moneda levantamiento:</label>
+            <select id="baumappLevMoneda" onchange="updateBaumAppLabels()" style="padding:6px 10px; border-radius:6px; border:1px solid #d0d5dd; font-size:13px;">
+              <option value="CLP">Pesos (CLP)</option>
+              <option value="USD">Dólares (USD)</option>
+            </select>
+            <span class="lev-info">Cobro único inicial</span>
+          </div>
+          <div class="tariff-lev-row" style="margin-top:8px;">
+            <label>Moneda servicio anual:</label>
+            <select id="baumappServMoneda" onchange="updateBaumAppLabels()" style="padding:6px 10px; border-radius:6px; border:1px solid #d0d5dd; font-size:13px;">
+              <option value="UF">UF</option>
+              <option value="USD">Dólares (USD)</option>
+            </select>
+            <span class="lev-info">Facturación mensual</span>
           </div>
         </div>
       </div>
@@ -457,6 +488,8 @@
   // ========== ESTADO ==========
   let ufActual = null;
   let ufFecha = '';
+  let usdActual = null;
+  let usdFecha = '';
   let currentTariffType = 'baumsystem';
 
   // Logo placeholder por defecto (letra B)
@@ -502,7 +535,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('cotDate').value = new Date().toISOString().split('T')[0];
     document.getElementById('logoPreview').src = DEFAULT_LOGO;
-    cargarUF();
+    cargarIndicadores();
     renderBaumSystemTable();
     renderBaumAppTable();
     addCampo();
@@ -522,7 +555,11 @@
     reader.readAsDataURL(file);
   }
 
-  // ========== UF ==========
+  // ========== INDICADORES ECONÓMICOS ==========
+  async function cargarIndicadores() {
+    await Promise.all([cargarUF(), cargarUSD()]);
+  }
+
   async function cargarUF() {
     const statusEl = document.getElementById('ufStatus');
     const valueEl = document.getElementById('ufValue');
@@ -548,6 +585,34 @@
     }
   }
 
+  async function cargarUSD() {
+    const statusEl = document.getElementById('usdStatus');
+    const valueEl = document.getElementById('usdValue');
+    const dateEl = document.getElementById('usdDate');
+    const manualBox = document.getElementById('manualUsdBox');
+    try {
+      const res = await fetch('https://mindicador.cl/api/dolar');
+      if (!res.ok) throw new Error('Error');
+      const data = await res.json();
+      if (data && data.serie && data.serie.length > 0) {
+        usdActual = data.serie[0].valor;
+        const fecha = new Date(data.serie[0].fecha);
+        usdFecha = fecha.toLocaleDateString('es-CL', { day: 'numeric', month: 'long', year: 'numeric' });
+        valueEl.textContent = '$' + formatNumber(usdActual);
+        dateEl.textContent = usdFecha;
+        statusEl.textContent = 'Actualizado'; statusEl.className = 'uf-status ok';
+        manualBox.style.display = 'none';
+        // Actualizar tipo de cambio en tarifario BaumApp
+        document.getElementById('tariffUsdClp').value = Math.round(usdActual);
+        recalcAll();
+      } else throw new Error('Sin datos');
+    } catch (e) {
+      valueEl.textContent = 'No disponible';
+      statusEl.textContent = 'Error - Ingresa manual'; statusEl.className = 'uf-status error';
+      manualBox.style.display = 'flex';
+    }
+  }
+
   function setManualUf() {
     const val = parseFloat(document.getElementById('manualUfInput').value);
     if (val > 0) {
@@ -556,6 +621,19 @@
       document.getElementById('ufDate').textContent = ufFecha;
       document.getElementById('ufStatus').textContent = 'Manual';
       document.getElementById('ufStatus').className = 'uf-status ok';
+      recalcAll();
+    }
+  }
+
+  function setManualUsd() {
+    const val = parseFloat(document.getElementById('manualUsdInput').value);
+    if (val > 0) {
+      usdActual = val; usdFecha = 'Ingresado manualmente';
+      document.getElementById('usdValue').textContent = '$' + formatNumber(val);
+      document.getElementById('usdDate').textContent = usdFecha;
+      document.getElementById('usdStatus').textContent = 'Manual';
+      document.getElementById('usdStatus').className = 'uf-status ok';
+      document.getElementById('tariffUsdClp').value = Math.round(val);
       recalcAll();
     }
   }
@@ -569,7 +647,24 @@
     document.getElementById('baumSystemTableWrap').style.display = type === 'baumsystem' ? '' : 'none';
     document.getElementById('baumAppTableWrap').style.display = type === 'baumapp' ? '' : 'none';
     document.getElementById('baumappConfig').style.display = type === 'baumapp' ? '' : 'none';
+    updateBaumAppLabels();
     updateTariffPreview();
+  }
+
+  function isBaumApp() { return currentTariffType === 'baumapp'; }
+  function getBaumAppLevMoneda() { return document.getElementById('baumappLevMoneda')?.value || 'CLP'; }
+  function getBaumAppServMoneda() { return document.getElementById('baumappServMoneda')?.value || 'UF'; }
+
+  function updateBaumAppLabels() {
+    // Actualizar labels de los campos según moneda seleccionada si es BaumApp
+    if (!isBaumApp()) return;
+    const levMoneda = getBaumAppLevMoneda();
+    const levSymbol = levMoneda === 'USD' ? 'USD' : '$';
+    document.querySelectorAll('.campo-card').forEach(card => {
+      const levLabel = card.querySelector('.campo-lev-ha')?.parentElement?.querySelector('label');
+      if (levLabel) levLabel.textContent = `Precio por Ha (${levMoneda === 'USD' ? 'USD' : '$'})`;
+    });
+    recalcAll();
   }
 
   // --- BaumSystem ---
@@ -794,17 +889,57 @@
     const levHa = parseFloat(card.querySelector('.campo-lev-ha').value) || 0;
     const servHa = parseFloat(card.querySelector('.campo-serv-ha').value) || 0;
 
-    const levNeto = ha * levHa;
-    const levIva = Math.round(levNeto * 1.19);
-    document.getElementById('lev-neto-' + id).textContent = '$' + formatNumber(levNeto);
-    document.getElementById('lev-iva-' + id).textContent = '$' + formatNumber(levIva);
+    if (isBaumApp()) {
+      const levMoneda = getBaumAppLevMoneda();
+      const servMoneda = getBaumAppServMoneda();
+      const rate = usdActual || parseFloat(document.getElementById('tariffUsdClp').value) || 950;
 
-    const servAnual = ha * servHa;
-    const servMensual = Math.round(servAnual / 12);
-    const servMensualUF = ufActual ? (Math.round((servMensual / ufActual) * 10) / 10) : 0;
-    document.getElementById('serv-anual-' + id).textContent = '$' + formatNumber(servAnual);
-    document.getElementById('serv-mensual-' + id).textContent = '$' + formatNumber(servMensual);
-    document.getElementById('serv-uf-' + id).textContent = servMensualUF + ' UF';
+      // Levantamiento BaumApp: en CLP o USD
+      if (levMoneda === 'USD') {
+        const levNetoUsd = ha * levHa;
+        const levNetoCLP = Math.round(levNetoUsd * rate);
+        const levIvaCLP = Math.round(levNetoCLP * 1.19);
+        document.getElementById('lev-neto-' + id).textContent = 'USD ' + formatNumber(levNetoUsd) + ' ($' + formatNumber(levNetoCLP) + ')';
+        document.getElementById('lev-iva-' + id).textContent = '$' + formatNumber(levIvaCLP);
+      } else {
+        const levNeto = ha * levHa;
+        const levIva = Math.round(levNeto * 1.19);
+        document.getElementById('lev-neto-' + id).textContent = '$' + formatNumber(levNeto);
+        document.getElementById('lev-iva-' + id).textContent = '$' + formatNumber(levIva);
+      }
+
+      // Servicio BaumApp: en UF o USD
+      if (servMoneda === 'USD') {
+        // servHa viene en CLP (ya convertido por getTariffPrice)
+        const servAnual = ha * servHa;
+        const servMensual = Math.round(servAnual / 12);
+        const servMensualUsd = usdActual ? Math.round((servMensual / rate) * 10) / 10 : 0;
+        document.getElementById('serv-anual-' + id).textContent = '$' + formatNumber(servAnual);
+        document.getElementById('serv-mensual-' + id).textContent = '$' + formatNumber(servMensual);
+        document.getElementById('serv-uf-' + id).textContent = 'USD ' + servMensualUsd;
+      } else {
+        // UF
+        const servAnual = ha * servHa;
+        const servMensual = Math.round(servAnual / 12);
+        const servMensualUF = ufActual ? (Math.round((servMensual / ufActual) * 10) / 10) : 0;
+        document.getElementById('serv-anual-' + id).textContent = '$' + formatNumber(servAnual);
+        document.getElementById('serv-mensual-' + id).textContent = '$' + formatNumber(servMensual);
+        document.getElementById('serv-uf-' + id).textContent = servMensualUF + ' UF';
+      }
+    } else {
+      // BaumSystem: todo en CLP y UF como siempre
+      const levNeto = ha * levHa;
+      const levIva = Math.round(levNeto * 1.19);
+      document.getElementById('lev-neto-' + id).textContent = '$' + formatNumber(levNeto);
+      document.getElementById('lev-iva-' + id).textContent = '$' + formatNumber(levIva);
+
+      const servAnual = ha * servHa;
+      const servMensual = Math.round(servAnual / 12);
+      const servMensualUF = ufActual ? (Math.round((servMensual / ufActual) * 10) / 10) : 0;
+      document.getElementById('serv-anual-' + id).textContent = '$' + formatNumber(servAnual);
+      document.getElementById('serv-mensual-' + id).textContent = '$' + formatNumber(servMensual);
+      document.getElementById('serv-uf-' + id).textContent = servMensualUF + ' UF';
+    }
 
     recalcAll();
   }
@@ -868,7 +1003,13 @@
     const cotDate = document.getElementById('cotDate').value;
     const cotValidez = document.getElementById('cotValidez').value || 10;
 
+    const esBaumApp = isBaumApp();
+    const levMoneda = getBaumAppLevMoneda();
+    const servMoneda = getBaumAppServMoneda();
+    const rate = usdActual || parseFloat(document.getElementById('tariffUsdClp').value) || 950;
+
     if (!ufActual) { alert('El valor de la UF no está disponible. Por favor ingresa el valor manualmente.'); return; }
+    if (esBaumApp && !usdActual) { alert('El valor del USD no está disponible. Por favor ingresa el valor manualmente.'); return; }
 
     const campos = [];
     document.querySelectorAll('.campo-card').forEach(card => {
@@ -877,13 +1018,28 @@
       const levHa = parseFloat(card.querySelector('.campo-lev-ha').value) || 0;
       const servHa = parseFloat(card.querySelector('.campo-serv-ha').value) || 0;
       if (nombre && ha > 0) {
-        const levNeto = ha * levHa;
-        const levIva = Math.round(levNeto * 1.19);
+        let levNeto, levIva, levCol6;
+        if (esBaumApp && levMoneda === 'USD') {
+          const levUsd = ha * levHa;
+          levNeto = Math.round(levUsd * rate);
+          levIva = Math.round(levNeto * 1.19);
+          levCol6 = 'USD ' + formatNumber(levUsd);
+        } else {
+          levNeto = ha * levHa;
+          levIva = Math.round(levNeto * 1.19);
+          levCol6 = ufActual ? (Math.round((levIva / ufActual) * 10) / 10) + ' UF' : '—';
+        }
+
         const servAnual = ha * servHa;
         const servMensual = Math.round(servAnual / 12);
-        const servMensualUF = Math.round((servMensual / ufActual) * 10) / 10;
-        const levIvaUF = Math.round((levIva / ufActual) * 10) / 10;
-        campos.push({ nombre, ha, levHa, levNeto, levIva, levIvaUF, servHa, servAnual, servMensual, servMensualUF });
+        let servCol6;
+        if (esBaumApp && servMoneda === 'USD') {
+          servCol6 = 'USD ' + (Math.round((servMensual / rate) * 10) / 10);
+        } else {
+          servCol6 = ufActual ? (Math.round((servMensual / ufActual) * 10) / 10) + ' UF' : '—';
+        }
+
+        campos.push({ nombre, ha, levHa, levNeto, levIva, levCol6, servHa, servAnual, servMensual, servCol6 });
       }
     });
 
@@ -894,13 +1050,39 @@
 
     const totalHa = campos.reduce((s, c) => s + c.ha, 0);
     const totalLevIva = campos.reduce((s, c) => s + c.levIva, 0);
-    const totalLevIvaUF = Math.round((totalLevIva / ufActual) * 10) / 10;
     const totalAnual = campos.reduce((s, c) => s + c.servAnual, 0);
     const totalMensual = campos.reduce((s, c) => s + c.servMensual, 0);
-    const totalMensualUF = Math.round((totalMensual / ufActual) * 10) / 10;
+
+    let totalLevCol6, totalServCol6;
+    if (esBaumApp && levMoneda === 'USD') {
+      const totalLevUsd = campos.reduce((s, c) => {
+        const usd = c.ha * c.levHa;
+        return s + usd;
+      }, 0);
+      totalLevCol6 = 'USD ' + formatNumber(Math.round(totalLevUsd * 1.19));
+    } else {
+      totalLevCol6 = (Math.round((totalLevIva / ufActual) * 10) / 10) + ' UF';
+    }
+
+    if (esBaumApp && servMoneda === 'USD') {
+      totalServCol6 = 'USD ' + (Math.round((totalMensual / rate) * 10) / 10);
+    } else {
+      totalServCol6 = (Math.round((totalMensual / ufActual) * 10) / 10) + ' UF';
+    }
+
+    // Labels de columnas según moneda
+    const levCol6Header = (esBaumApp && levMoneda === 'USD') ? 'TOTAL USD' : 'UF + IVA';
+    const levPrecioHeader = (esBaumApp && levMoneda === 'USD') ? 'PRECIO/Ha (USD)' : 'PRECIO/Ha';
+    const servCol6Header = (esBaumApp && servMoneda === 'USD') ? 'MENSUAL USD + IVA' : 'VALOR MENSUAL UF + IVA';
 
     const logoSrc = logoDataUrl || DEFAULT_LOGO;
     const logoHtml = `<div class="cot-logo"><img src="${logoSrc}" alt="Baum"></div>`;
+
+    // Nota de indicadores
+    let notaIndicadores = `*Valor UF calculado $${formatNumber(ufActual)} (${ufFecha})`;
+    if (esBaumApp) {
+      notaIndicadores += ` | USD $${formatNumber(usdActual)} (${usdFecha})`;
+    }
 
     let html = `
       <div class="cot-header">
@@ -927,27 +1109,27 @@
       <div class="edit-hint">Haz clic en cualquier valor de las tablas para editarlo antes de imprimir</div>
       <div class="cot-section-title">Levantamiento</div>
       <table class="cot-table">
-        <thead><tr><th>CAMPO</th><th>SUPERFICIE (Ha)</th><th>PRECIO/Ha</th><th>NETO</th><th>TOTAL + IVA</th><th>UF + IVA</th></tr></thead>
+        <thead><tr><th>CAMPO</th><th>SUPERFICIE (Ha)</th><th>${levPrecioHeader}</th><th>NETO</th><th>TOTAL + IVA</th><th>${levCol6Header}</th></tr></thead>
         <tbody>
           ${campos.map(c => `<tr>
             <td contenteditable="true">${c.nombre}</td>
             <td contenteditable="true">${formatNumber(c.ha)}</td>
-            <td contenteditable="true">$${formatNumber(c.levHa)}</td>
+            <td contenteditable="true">${(esBaumApp && levMoneda === 'USD') ? 'USD ' + formatNumber(c.levHa) : '$' + formatNumber(c.levHa)}</td>
             <td contenteditable="true">$${formatNumber(c.levNeto)}</td>
             <td contenteditable="true"><strong>$${formatNumber(c.levIva)}</strong></td>
-            <td contenteditable="true">${c.levIvaUF}</td>
+            <td contenteditable="true">${c.levCol6}</td>
           </tr>`).join('')}
           ${campos.length > 1 ? `<tr class="totals-row">
             <td><strong>TOTAL</strong></td><td><strong>${formatNumber(totalHa)}</strong></td>
             <td>—</td><td>—</td>
             <td contenteditable="true"><strong>$${formatNumber(totalLevIva)}</strong></td>
-            <td contenteditable="true"><strong>${totalLevIvaUF}</strong></td>
+            <td contenteditable="true"><strong>${totalLevCol6}</strong></td>
           </tr>` : ''}
         </tbody>
       </table>
-      <div class="cot-section-title">Servicio Baum (Has/año)</div>
+      <div class="cot-section-title">Servicio ${esBaumApp ? 'BaumApp' : 'Baum'} (Has/año)</div>
       <table class="cot-table">
-        <thead><tr><th>CAMPO</th><th>SUPERFICIE (Ha)</th><th>VALOR Ha/AÑO</th><th>VALOR ANUAL</th><th>VALOR MENSUAL + IVA</th><th>VALOR MENSUAL UF + IVA</th></tr></thead>
+        <thead><tr><th>CAMPO</th><th>SUPERFICIE (Ha)</th><th>VALOR Ha/AÑO</th><th>VALOR ANUAL</th><th>VALOR MENSUAL + IVA</th><th>${servCol6Header}</th></tr></thead>
         <tbody>
           ${campos.map(c => `<tr>
             <td contenteditable="true">${c.nombre}</td>
@@ -955,18 +1137,18 @@
             <td contenteditable="true"><strong>$${formatNumber(c.servHa)}</strong></td>
             <td contenteditable="true">$${formatNumber(c.servAnual)}</td>
             <td contenteditable="true">$${formatNumber(c.servMensual)}</td>
-            <td contenteditable="true">${c.servMensualUF}</td>
+            <td contenteditable="true">${c.servCol6}</td>
           </tr>`).join('')}
           ${campos.length > 1 ? `<tr class="totals-row">
             <td><strong>TOTAL</strong></td><td><strong>${formatNumber(totalHa)}</strong></td>
             <td>—</td>
             <td contenteditable="true"><strong>$${formatNumber(totalAnual)}</strong></td>
             <td contenteditable="true"><strong>$${formatNumber(totalMensual)}</strong></td>
-            <td contenteditable="true"><strong>${totalMensualUF}</strong></td>
+            <td contenteditable="true"><strong>${totalServCol6}</strong></td>
           </tr>` : ''}
         </tbody>
       </table>
-      <div class="cot-uf-note">*Valor UF calculado $${formatNumber(ufActual)} (${ufFecha})</div>
+      <div class="cot-uf-note">${notaIndicadores}</div>
       <div class="cot-desc-title">DESCRIPCIÓN DEL SERVICIO</div>
       <ul class="cot-desc-list">${servicios.map(s => `<li>${s}</li>`).join('')}</ul>
       <div class="cot-validez">Cotización Válida por ${cotValidez} días desde la fecha.</div>
