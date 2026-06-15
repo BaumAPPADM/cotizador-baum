@@ -498,8 +498,8 @@
 
   // Tablas de tarifas editables
   const baumSystemDefaults = [
-    { min: 1, max: 69, price: 150000 },
-    { min: 70, max: 100, price: 85000 },
+    { min: 1, max: 69, price: 385000 },
+    { min: 70, max: 100, price: 90000 },
     { min: 101, max: 150, price: 77000 },
     { min: 151, max: 200, price: 69000 },
     { min: 201, max: 250, price: 61000 },
@@ -1049,6 +1049,23 @@
     document.querySelectorAll('.serv-text').forEach(input => { if (input.value.trim()) servicios.push(input.value.trim()); });
 
     const totalHa = campos.reduce((s, c) => s + c.ha, 0);
+
+    // Ajustar visitas según rango BaumSystem: 1-69 ha = 1 visita, resto = 2 visitas
+    if (!isBaumApp()) {
+      const numVisitas = totalHa <= 69 ? 1 : 2;
+      for (let i = 0; i < servicios.length; i++) {
+        if (servicios[i].match(/visita.*auditor[ií]a.*general/i)) {
+          servicios[i] = numVisitas === 1
+            ? 'Visita o auditoría general a todo el sistema y equipo de riego (1 visita mensual).'
+            : 'Visita o auditoría general a todo el sistema y equipo de riego (2 visitas mensuales).';
+        }
+        if (servicios[i].match(/visita.*equipo.*supervisor/i)) {
+          servicios[i] = numVisitas === 1
+            ? 'Visita equipo de supervisores para apoyo del equipo humano y revisión del funcionamiento de los equipos de riego (1 visita mensual).'
+            : 'Visita equipo de supervisores durante el mes para apoyo del equipo humano y revisión del funcionamiento de los equipos de riego (2 visitas mensuales).';
+        }
+      }
+    }
     const totalLevIva = campos.reduce((s, c) => s + c.levIva, 0);
     const totalAnual = campos.reduce((s, c) => s + c.servAnual, 0);
     const totalMensual = campos.reduce((s, c) => s + c.servMensual, 0);
