@@ -40,10 +40,6 @@
   .uf-display .uf-label { font-size: 13px; color: #555; }
   .uf-display .uf-value { font-size: 20px; font-weight: 700; color: #2d5016; }
   .uf-display .uf-date { font-size: 12px; color: #888; margin-left: auto; }
-  .uf-status { font-size: 12px; padding: 3px 8px; border-radius: 12px; font-weight: 600; }
-  .uf-status.ok { background: #d4edda; color: #155724; }
-  .uf-status.error { background: #f8d7da; color: #721c24; }
-  .uf-status.loading { background: #fff3cd; color: #856404; }
   .manual-uf { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
   .manual-uf input { width: 140px; padding: 6px 10px; border: 1px solid #d0d5dd; border-radius: 6px; font-size: 14px; font-family: 'Inter', sans-serif; }
   .manual-uf button { padding: 6px 12px; background: #2d5016; color: #fff; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
@@ -281,34 +277,34 @@
   <h1>Generador de Cotizaciones</h1>
   <p class="subtitle">CYG Riego SPA — Baumsystem Control y Gestión de Riego</p>
 
-  <!-- Indicadores económicos -->
-  <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+  <!-- Indicadores económicos - ingreso manual -->
+  <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:16px;">
     <div class="uf-display" style="flex:1; min-width:200px;">
-      <div>
-        <div class="uf-label">Valor UF del día</div>
-        <div class="uf-value" id="ufValue">Cargando...</div>
+      <div style="flex:1;">
+        <div class="uf-label">Valor UF</div>
+        <div style="display:flex; align-items:center; gap:8px; margin-top:6px;">
+          <span style="font-size:16px; font-weight:700; color:#2d5016;">$</span>
+          <input type="number" id="manualUfInput" step="0.01" placeholder="Ej: 39934.00"
+            style="width:150px; padding:8px 10px; border:1px solid #c5ddb8; border-radius:6px; font-size:15px; font-weight:700; font-family:'Inter',sans-serif; color:#2d5016;"
+            oninput="setManualUf()">
+        </div>
       </div>
-      <span class="uf-status loading" id="ufStatus">Consultando...</span>
-      <div class="uf-date" id="ufDate"></div>
+      <a href="https://www.google.com/search?q=valor+uf+hoy+chile" target="_blank" rel="noopener"
+        style="font-size:11px; color:#2d5016; text-decoration:underline; white-space:nowrap;">Ver UF hoy</a>
     </div>
     <div class="uf-display" style="flex:1; min-width:200px;">
-      <div>
-        <div class="uf-label">Valor USD del día</div>
-        <div class="uf-value" id="usdValue">Cargando...</div>
+      <div style="flex:1;">
+        <div class="uf-label">Valor USD (CLP)</div>
+        <div style="display:flex; align-items:center; gap:8px; margin-top:6px;">
+          <span style="font-size:16px; font-weight:700; color:#2d5016;">$</span>
+          <input type="number" id="manualUsdInput" step="0.01" placeholder="Ej: 950.00"
+            style="width:150px; padding:8px 10px; border:1px solid #c5ddb8; border-radius:6px; font-size:15px; font-weight:700; font-family:'Inter',sans-serif; color:#2d5016;"
+            oninput="setManualUsd()">
+        </div>
       </div>
-      <span class="uf-status loading" id="usdStatus">Consultando...</span>
-      <div class="uf-date" id="usdDate"></div>
+      <a href="https://www.google.com/finance/quote/USD-CLP" target="_blank" rel="noopener"
+        style="font-size:11px; color:#2d5016; text-decoration:underline; white-space:nowrap;">Ver USD hoy</a>
     </div>
-  </div>
-  <div class="manual-uf" id="manualUfBox" style="display:none; margin-bottom: 8px;">
-    <span style="font-size:13px; color:#666;">Ingresar UF manual:</span>
-    <input type="number" id="manualUfInput" step="0.01" placeholder="Ej: 39934.00">
-    <button onclick="setManualUf()">Usar este valor</button>
-  </div>
-  <div class="manual-uf" id="manualUsdBox" style="display:none; margin-bottom: 16px;">
-    <span style="font-size:13px; color:#666;">Ingresar USD manual:</span>
-    <input type="number" id="manualUsdInput" step="0.01" placeholder="Ej: 950.00">
-    <button onclick="setManualUsd()">Usar este valor</button>
   </div>
 
   <!-- ========== CALCULADORA DE TARIFAS ========== -->
@@ -535,7 +531,6 @@
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('cotDate').value = new Date().toISOString().split('T')[0];
     document.getElementById('logoPreview').src = DEFAULT_LOGO;
-    cargarIndicadores();
     renderBaumSystemTable();
     renderBaumAppTable();
     addCampo();
@@ -555,72 +550,11 @@
     reader.readAsDataURL(file);
   }
 
-  // ========== INDICADORES ECONÓMICOS ==========
-  async function cargarIndicadores() {
-    await Promise.all([cargarUF(), cargarUSD()]);
-  }
-
-  async function cargarUF() {
-    const statusEl = document.getElementById('ufStatus');
-    const valueEl = document.getElementById('ufValue');
-    const dateEl = document.getElementById('ufDate');
-    const manualBox = document.getElementById('manualUfBox');
-    try {
-      const res = await fetch('https://mindicador.cl/api/uf');
-      if (!res.ok) throw new Error('Error');
-      const data = await res.json();
-      if (data && data.serie && data.serie.length > 0) {
-        ufActual = data.serie[0].valor;
-        const fecha = new Date(data.serie[0].fecha);
-        ufFecha = fecha.toLocaleDateString('es-CL', { day: 'numeric', month: 'long', year: 'numeric' });
-        valueEl.textContent = '$' + formatNumber(ufActual);
-        dateEl.textContent = ufFecha;
-        statusEl.textContent = 'Actualizado'; statusEl.className = 'uf-status ok';
-        manualBox.style.display = 'none'; recalcAll();
-      } else throw new Error('Sin datos');
-    } catch (e) {
-      valueEl.textContent = 'No disponible';
-      statusEl.textContent = 'Error - Ingresa manual'; statusEl.className = 'uf-status error';
-      manualBox.style.display = 'flex';
-    }
-  }
-
-  async function cargarUSD() {
-    const statusEl = document.getElementById('usdStatus');
-    const valueEl = document.getElementById('usdValue');
-    const dateEl = document.getElementById('usdDate');
-    const manualBox = document.getElementById('manualUsdBox');
-    try {
-      const res = await fetch('https://mindicador.cl/api/dolar');
-      if (!res.ok) throw new Error('Error');
-      const data = await res.json();
-      if (data && data.serie && data.serie.length > 0) {
-        usdActual = data.serie[0].valor;
-        const fecha = new Date(data.serie[0].fecha);
-        usdFecha = fecha.toLocaleDateString('es-CL', { day: 'numeric', month: 'long', year: 'numeric' });
-        valueEl.textContent = '$' + formatNumber(usdActual);
-        dateEl.textContent = usdFecha;
-        statusEl.textContent = 'Actualizado'; statusEl.className = 'uf-status ok';
-        manualBox.style.display = 'none';
-        // Actualizar tipo de cambio en tarifario BaumApp
-        document.getElementById('tariffUsdClp').value = Math.round(usdActual);
-        recalcAll();
-      } else throw new Error('Sin datos');
-    } catch (e) {
-      valueEl.textContent = 'No disponible';
-      statusEl.textContent = 'Error - Ingresa manual'; statusEl.className = 'uf-status error';
-      manualBox.style.display = 'flex';
-    }
-  }
-
+  // ========== INDICADORES ECONÓMICOS (manual) ==========
   function setManualUf() {
     const val = parseFloat(document.getElementById('manualUfInput').value);
     if (val > 0) {
       ufActual = val; ufFecha = 'Ingresado manualmente';
-      document.getElementById('ufValue').textContent = '$' + formatNumber(val);
-      document.getElementById('ufDate').textContent = ufFecha;
-      document.getElementById('ufStatus').textContent = 'Manual';
-      document.getElementById('ufStatus').className = 'uf-status ok';
       recalcAll();
     }
   }
@@ -629,10 +563,6 @@
     const val = parseFloat(document.getElementById('manualUsdInput').value);
     if (val > 0) {
       usdActual = val; usdFecha = 'Ingresado manualmente';
-      document.getElementById('usdValue').textContent = '$' + formatNumber(val);
-      document.getElementById('usdDate').textContent = usdFecha;
-      document.getElementById('usdStatus').textContent = 'Manual';
-      document.getElementById('usdStatus').className = 'uf-status ok';
       document.getElementById('tariffUsdClp').value = Math.round(val);
       recalcAll();
     }
