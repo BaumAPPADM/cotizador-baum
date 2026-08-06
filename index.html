@@ -926,6 +926,14 @@
     return d.getDate() + ' ' + meses[d.getMonth()] + ' ' + d.getFullYear();
   }
 
+  // ========== CORRELATIVO ==========
+  function getNextCotNumber() {
+    let num = parseInt(localStorage.getItem('baum_cot_correlativo') || '0') + 1;
+    localStorage.setItem('baum_cot_correlativo', num);
+    return num;
+  }
+  function formatCotNumber(n) { return 'COT-' + String(n).padStart(4, '0'); }
+
   // ========== GENERAR COTIZACIÓN ==========
   function generarCotizacion() {
     const clientName = document.getElementById('clientName').value || 'Cliente';
@@ -937,6 +945,10 @@
     const levMoneda = getBaumAppLevMoneda();
     const servMoneda = getBaumAppServMoneda();
     const rate = usdActual || parseFloat(document.getElementById('tariffUsdClp').value) || 950;
+
+    // Correlativo
+    const cotNum = getNextCotNumber();
+    const cotNumStr = formatCotNumber(cotNum);
 
     if (!ufActual) { alert('El valor de la UF no está disponible. Por favor ingresa el valor manualmente.'); return; }
     if (esBaumApp && !usdActual) { alert('El valor del USD no está disponible. Por favor ingresa el valor manualmente.'); return; }
@@ -1037,7 +1049,7 @@
         <div class="cot-title-box">
           <div class="cot-title-bar">
             <div class="cot-title-accent"></div>
-            <span class="cot-title-text">COTIZACIÓN</span>
+            <span class="cot-title-text">COTIZACIÓN ${cotNumStr}</span>
           </div>
         </div>
       </div>
@@ -1110,8 +1122,19 @@
   function imprimirPDF() {
     const editables = document.querySelectorAll('[contenteditable="true"]');
     editables.forEach(el => el.setAttribute('contenteditable', 'false'));
+    // Nombre del archivo: COT-XXXX_Cliente_2026-08-06
+    const origTitle = document.title;
+    const cotTitle = document.querySelector('.cot-title-text');
+    const cotNumMatch = cotTitle ? cotTitle.textContent.match(/COT-\d+/) : null;
+    const clientEl = document.getElementById('clientName');
+    const clientStr = (clientEl && clientEl.value) ? clientEl.value.replace(/[^a-zA-Z0-9áéíóúñÁÉÍÓÚÑ ]/g, '').trim().replace(/\s+/g, '_') : 'Cliente';
+    const dateStr = new Date().toISOString().split('T')[0];
+    document.title = (cotNumMatch ? cotNumMatch[0] : 'Cotizacion') + '_' + clientStr + '_' + dateStr;
     window.print();
-    setTimeout(() => { editables.forEach(el => el.setAttribute('contenteditable', 'true')); }, 500);
+    setTimeout(() => {
+      document.title = origTitle;
+      editables.forEach(el => el.setAttribute('contenteditable', 'true'));
+    }, 500);
   }
 </script>
 </body>
