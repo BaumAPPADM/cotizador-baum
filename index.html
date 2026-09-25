@@ -14,7 +14,7 @@
     max-width: 900px; margin: 30px auto; background: #fff;
     border-radius: 12px; padding: 30px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);
   }
-  .form-container h1 { font-size: 22px; color: #2d5016; margin-bottom: 6px; }
+  .form-container h1 { font-size: 22px; color: #3C5D3A; margin-bottom: 6px; }
   .form-container .subtitle { color: #666; font-size: 14px; margin-bottom: 24px; }
   .form-row { display: flex; gap: 16px; margin-bottom: 16px; }
   .form-group { flex: 1; display: flex; flex-direction: column; }
@@ -24,10 +24,10 @@
     font-size: 14px; font-family: 'Inter', sans-serif; transition: border 0.2s;
   }
   .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
-    outline: none; border-color: #2d5016; box-shadow: 0 0 0 3px rgba(45,80,22,0.1);
+    outline: none; border-color: #3C5D3A; box-shadow: 0 0 0 3px rgba(60,93,58,0.1);
   }
   .section-title {
-    font-size: 16px; font-weight: 700; color: #2d5016;
+    font-size: 16px; font-weight: 700; color: #3C5D3A;
     margin: 24px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #e8ece5;
   }
   .section-subtitle { font-size: 12px; color: #888; font-weight: 400; margin-left: 8px; }
@@ -38,11 +38,38 @@
     padding: 12px 16px; display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
   }
   .uf-display .uf-label { font-size: 13px; color: #555; }
-  .uf-display .uf-value { font-size: 20px; font-weight: 700; color: #2d5016; }
+  .uf-display .uf-value { font-size: 20px; font-weight: 700; color: #3C5D3A; }
   .uf-display .uf-date { font-size: 12px; color: #888; margin-left: auto; }
   .manual-uf { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
   .manual-uf input { width: 140px; padding: 6px 10px; border: 1px solid #d0d5dd; border-radius: 6px; font-size: 14px; font-family: 'Inter', sans-serif; }
-  .manual-uf button { padding: 6px 12px; background: #2d5016; color: #fff; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .manual-uf button { padding: 6px 12px; background: #3C5D3A; color: #fff; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+
+  /* ========== TOOLTIPS ========== */
+  .tip {
+    position: relative; display: inline-flex; align-items: center; justify-content: center;
+    width: 15px; height: 15px; border-radius: 50%; background: #d0d5dd; color: #555;
+    font-size: 10px; font-weight: 700; font-style: normal; cursor: help;
+    margin-left: 4px; vertical-align: middle; flex-shrink: 0; line-height: 1;
+    transition: background 0.2s;
+  }
+  .tip:hover { background: #3C5D3A; color: #fff; }
+  .tip .tip-text {
+    visibility: hidden; opacity: 0;
+    position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+    width: 260px; padding: 10px 12px; background: #1a1a2e; color: #eee;
+    font-size: 12px; font-weight: 400; line-height: 1.5; border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.25); z-index: 100;
+    transition: opacity 0.2s, visibility 0.2s;
+    pointer-events: none; font-family: 'Inter', sans-serif;
+  }
+  .tip .tip-text::after {
+    content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+    border: 6px solid transparent; border-top-color: #1a1a2e;
+  }
+  .tip:hover .tip-text { visibility: visible; opacity: 1; }
+  /* Tooltips que se salen por la derecha */
+  .tip.tip-left .tip-text { left: auto; right: -8px; transform: none; }
+  .tip.tip-left .tip-text::after { left: auto; right: 12px; transform: none; }
 
   /* ========== CALCULADORA DE TARIFAS ========== */
   .tariff-panel {
@@ -52,9 +79,9 @@
   .tariff-panel-header {
     display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;
   }
-  .tariff-panel-header h2 { font-size: 17px; color: #1a3a6e; }
+  .tariff-panel-header h2 { font-size: 17px; color: #3C5D3A; }
   .tariff-badge {
-    font-size: 10px; background: #e0e7f5; color: #1a3a6e; padding: 3px 10px;
+    font-size: 10px; background: #e8ece5; color: #3C5D3A; padding: 3px 10px;
     border-radius: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
   }
   .tariff-tabs {
@@ -66,7 +93,8 @@
     cursor: pointer; border: none; background: #fff; color: #666;
     font-family: 'Inter', sans-serif; transition: all 0.2s;
   }
-  .tariff-tab.active { background: #1a3a6e; color: #fff; }
+  .tariff-tab.active { background: #3C5D3A; color: #fff; }
+  .tariff-tab.active.blum-active { background: #002E2B; }
   .tariff-tab:hover:not(.active) { background: #f0f2f5; }
 
   .tariff-body { display: flex; gap: 20px; }
@@ -75,26 +103,26 @@
 
   .tariff-table { width: 100%; border-collapse: collapse; font-size: 13px; }
   .tariff-table thead th {
-    background: #1a3a6e; color: #fff; padding: 8px 10px; text-align: left; font-size: 11px;
+    background: #3C5D3A; color: #fff; padding: 8px 10px; text-align: left; font-size: 11px;
     letter-spacing: 0.3px;
   }
   .tariff-table thead th:first-child { border-radius: 6px 0 0 0; }
   .tariff-table thead th:last-child { border-radius: 0 6px 0 0; text-align: right; }
   .tariff-table tbody td { padding: 7px 10px; border-bottom: 1px solid #eee; }
-  .tariff-table tbody td:last-child { text-align: right; font-weight: 700; color: #1a3a6e; }
-  .tariff-table tbody tr.active-range { background: #eef3ff; }
+  .tariff-table tbody td:last-child { text-align: right; font-weight: 700; color: #3C5D3A; }
+  .tariff-table tbody tr.active-range { background: #edf2ea; }
   .tariff-table tbody td input {
     width: 100%; padding: 4px 6px; border: 1px solid #ddd; border-radius: 4px;
     font-size: 12px; font-family: 'Inter', sans-serif; text-align: right;
   }
-  .tariff-table tbody td input:focus { outline: none; border-color: #1a3a6e; }
+  .tariff-table tbody td input:focus { outline: none; border-color: #3C5D3A; }
 
   .tariff-result {
-    background: #eef3ff; border-radius: 8px; padding: 14px; margin-top: 12px; text-align: center;
+    background: #edf2ea; border-radius: 8px; padding: 14px; margin-top: 12px; text-align: center;
   }
   .tariff-result .tr-label { font-size: 12px; color: #666; }
-  .tariff-result .tr-category { font-size: 13px; color: #1a3a6e; font-weight: 600; margin: 4px 0; }
-  .tariff-result .tr-price { font-size: 24px; font-weight: 800; color: #1a3a6e; }
+  .tariff-result .tr-category { font-size: 13px; color: #3C5D3A; font-weight: 600; margin: 4px 0; }
+  .tariff-result .tr-price { font-size: 24px; font-weight: 800; color: #3C5D3A; }
   .tariff-result .tr-note { font-size: 11px; color: #999; margin-top: 4px; }
 
   .tariff-lev-row {
@@ -106,16 +134,16 @@
     width: 120px; padding: 6px 10px; border: 1px solid #d0d5dd; border-radius: 6px;
     font-size: 13px; font-family: 'Inter', sans-serif;
   }
-  .tariff-lev-row input:focus { outline: none; border-color: #1a3a6e; }
+  .tariff-lev-row input:focus { outline: none; border-color: #3C5D3A; }
   .tariff-lev-row .lev-info { font-size: 11px; color: #888; }
 
   .btn-apply-tariff {
     display: block; width: 100%; margin-top: 14px; padding: 10px;
-    background: #1a3a6e; color: #fff; border: none; border-radius: 8px;
+    background: #3C5D3A; color: #fff; border: none; border-radius: 8px;
     font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif;
     transition: background 0.2s;
   }
-  .btn-apply-tariff:hover { background: #254d8e; }
+  .btn-apply-tariff:hover { background: #2d4a2b; }
 
   /* Campos dinámicos */
   .campo-card {
@@ -128,7 +156,7 @@
   .campo-card-modules { display: flex; gap: 16px; }
   .campo-module { flex: 1; background: #fff; border-radius: 8px; padding: 12px; border: 1px solid #e8e8e8; }
   .campo-module-title {
-    font-size: 12px; font-weight: 700; color: #2d5016; text-transform: uppercase;
+    font-size: 12px; font-weight: 700; color: #3C5D3A; text-transform: uppercase;
     letter-spacing: 0.5px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #e8ece5;
   }
   .campo-module .form-group { margin-bottom: 6px; }
@@ -139,10 +167,10 @@
     background: #f0f7eb; border-radius: 6px; padding: 6px 10px; margin-top: 6px; font-size: 12px;
   }
   .calc-result .calc-label { color: #555; font-weight: 500; }
-  .calc-result .calc-value { font-weight: 700; color: #2d5016; font-size: 13px; }
+  .calc-result .calc-value { font-weight: 700; color: #3C5D3A; font-size: 13px; }
 
   .btn { padding: 8px 16px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; }
-  .btn-add { background: #e8ece5; color: #2d5016; }
+  .btn-add { background: #e8ece5; color: #3C5D3A; }
   .btn-add:hover { background: #d4ddd0; }
   .btn-remove-card {
     position: absolute; top: 10px; right: 10px; background: #fee; color: #c00;
@@ -156,7 +184,7 @@
     flex: 1; padding: 8px 12px; border: 1px solid #d0d5dd; border-radius: 8px;
     font-size: 13px; font-family: 'Inter', sans-serif;
   }
-  .servicio-item input[type="text"]:focus { outline: none; border-color: #2d5016; }
+  .servicio-item input[type="text"]:focus { outline: none; border-color: #3C5D3A; }
   .btn-remove-serv {
     background: #fee; color: #c00; min-width: 32px; height: 32px;
     display: flex; align-items: center; justify-content: center;
@@ -166,23 +194,23 @@
 
   /* Resumen en vivo */
   .live-summary { background: #f7f9f5; border: 2px solid #c5ddb8; border-radius: 10px; padding: 16px; margin-top: 20px; }
-  .live-summary h3 { font-size: 14px; color: #2d5016; margin-bottom: 10px; }
+  .live-summary h3 { font-size: 14px; color: #3C5D3A; margin-bottom: 10px; }
   .summary-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
   .summary-item { text-align: center; }
   .summary-item .s-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.3px; }
-  .summary-item .s-value { font-size: 18px; font-weight: 700; color: #2d5016; }
+  .summary-item .s-value { font-size: 18px; font-weight: 700; color: #3C5D3A; }
   .summary-item .s-sub { font-size: 11px; color: #999; }
 
   .btn-generate {
-    background: #2d5016; color: #fff; padding: 14px 32px; font-size: 16px;
+    background: #3C5D3A; color: #fff; padding: 14px 32px; font-size: 16px;
     font-weight: 700; border-radius: 10px; width: 100%; margin-top: 20px; letter-spacing: 0.3px;
   }
-  .btn-generate:hover { background: #3a6b1e; }
+  .btn-generate:hover { background: #2d4a2b; }
 
   /* Logo upload */
   .logo-upload-group { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
   .logo-upload-group label.upload-btn {
-    padding: 8px 14px; background: #e8ece5; color: #2d5016; border-radius: 8px;
+    padding: 8px 14px; background: #e8ece5; color: #3C5D3A; border-radius: 8px;
     font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s;
   }
   .logo-upload-group label.upload-btn:hover { background: #d4ddd0; }
@@ -195,7 +223,7 @@
   }
   .pdf-overlay.active { display: flex; flex-direction: column; align-items: center; }
   .pdf-actions { display: flex; gap: 12px; margin-bottom: 16px; position: sticky; top: 0; z-index: 10; }
-  .btn-pdf { background: #fff; color: #2d5016; padding: 10px 24px; font-weight: 700; border-radius: 8px; }
+  .btn-pdf { background: #fff; color: #3C5D3A; padding: 10px 24px; font-weight: 700; border-radius: 8px; }
   .btn-pdf:hover { background: #f0f7eb; }
   .btn-close-pdf { background: #eee; color: #333; padding: 10px 24px; font-weight: 600; border-radius: 8px; }
   .btn-close-pdf:hover { background: #ddd; }
@@ -204,49 +232,60 @@
     width: 210mm; min-height: 297mm; background: #fff; padding: 0;
     position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.2); overflow: hidden;
     -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    display: flex; flex-direction: column;
   }
-  .cot-content { padding: 32px 40px 30px; }
+  .cot-content { padding: 32px 40px 30px; flex: 1; }
   .cot-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; }
   .cot-logo { width: 80px; height: 80px; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
   .cot-logo img { width: 100%; height: 100%; object-fit: contain; }
   .cot-title-box { text-align: right; }
   .cot-title-bar { display: inline-flex; align-items: center; gap: 8px; }
-  .cot-title-accent { width: 25px; height: 3px; background: #2d5016; border-radius: 2px; }
+  .cot-title-accent { width: 25px; height: 3px; background: #3C5D3A; border-radius: 2px; }
   .cot-title-text { font-size: 16px; font-weight: 500; color: #999; letter-spacing: 3px; text-transform: uppercase; }
   .cot-client-info { display: flex; justify-content: space-between; margin-bottom: 28px; }
   .cot-client-left p { font-size: 14px; margin-bottom: 4px; color: #444; }
   .cot-client-left p strong { color: #222; }
   .cot-client-right { text-align: right; font-size: 13px; color: #555; line-height: 1.6; }
-  .cot-client-right .company { font-size: 16px; font-weight: 700; color: #2d5016; }
+  .cot-client-right .company { font-size: 16px; font-weight: 700; color: #3C5D3A; }
   .cot-section-title { text-align: center; font-size: 16px; font-weight: 600; color: #555; margin: 20px 0 10px; }
   .cot-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 13px; }
   .cot-table thead th {
-    background: #2d5016; color: #fff; padding: 10px 12px; text-align: center;
+    background: #3C5D3A; color: #fff; padding: 10px 12px; text-align: center;
     font-weight: 600; font-size: 11px; letter-spacing: 0.3px;
   }
   .cot-table thead th:first-child { text-align: left; border-radius: 6px 0 0 0; }
   .cot-table thead th:last-child { border-radius: 0 6px 0 0; }
   .cot-table tbody td { padding: 10px 12px; border-bottom: 1px solid #e8e8e8; text-align: center; }
   .cot-table tbody td:first-child { text-align: left; }
-  .cot-table tbody tr:last-child td { border-bottom: 2px solid #2d5016; }
-  .cot-uf-note { text-align: center; font-size: 12px; color: #888; font-style: italic; margin-bottom: 16px; }
-  .cot-desc-title {
-    text-align: center; font-size: 14px; font-weight: 700; color: #333;
-    padding: 10px; border-top: 2px solid #2d5016; border-bottom: 1px solid #ddd; margin-bottom: 12px;
+  .cot-table tbody tr:last-child td { border-bottom: 2px solid #3C5D3A; }
+  .cot-uf-note { text-align: center; font-size: 12px; color: #888; font-style: italic; margin-bottom: 24px; }
+  .cot-desc-box {
+    background: #f9fbf8; border: 1px solid #e0e6dc; border-radius: 10px;
+    padding: 24px 32px 20px; margin-top: 8px;
   }
-  .cot-desc-list { padding-left: 20px; margin-bottom: 20px; }
-  .cot-desc-list li { font-size: 12.5px; color: #444; margin-bottom: 6px; line-height: 1.5; }
-  .cot-validez { text-align: center; font-size: 14px; font-weight: 600; color: #8a9a82; font-style: italic; margin-top: 20px; }
+  .cot-desc-title {
+    text-align: center; font-size: 13px; font-weight: 700; color: #555;
+    text-transform: uppercase; letter-spacing: 1.5px;
+    padding-bottom: 10px; border-bottom: 2px solid #3C5D3A; margin-bottom: 16px;
+  }
+  .cot-desc-list { padding-left: 20px; margin-bottom: 0; }
+  .cot-desc-list li { font-size: 12.5px; color: #444; margin-bottom: 8px; line-height: 1.6; }
+  .cot-desc-list li:last-child { margin-bottom: 0; }
+  .cot-validez {
+    text-align: center; font-size: 13px; font-weight: 600; color: #8a9a82; font-style: italic;
+    margin-top: 20px; padding-top: 14px; border-top: 1px solid #e0e6dc;
+  }
   .cot-table tbody td[contenteditable="true"] { cursor: text; transition: background 0.2s; }
   .cot-table tbody td[contenteditable="true"]:hover { background: #f9fdf6; }
-  .cot-table tbody td[contenteditable="true"]:focus { outline: 2px solid #2d5016; outline-offset: -2px; background: #f0f7eb; }
+  .cot-table tbody td[contenteditable="true"]:focus { outline: 2px solid #3C5D3A; outline-offset: -2px; background: #f0f7eb; }
   .edit-hint { text-align: center; font-size: 11px; color: #aaa; margin-bottom: 12px; font-style: italic; }
   .totals-row td { font-weight: 700 !important; background: #f0f7eb; }
 
   .cot-footer {
-    background: #2d3a2d; padding: 18px 40px; display: flex; align-items: center;
+    background: #202820; padding: 18px 40px; display: flex; align-items: center;
     justify-content: center; gap: 30px;
     -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    margin-top: auto; flex-shrink: 0;
   }
   .cot-footer span { color: #fff; font-size: 13px; font-weight: 500; letter-spacing: 0.3px; }
   .cot-footer .sep { color: #fff; opacity: 0.4; font-size: 20px; }
@@ -258,24 +297,70 @@
     body { background: #fff; margin: 0; padding: 0; }
     .form-container, .pdf-actions, .edit-hint { display: none !important; }
     .pdf-overlay { display: block !important; position: static; background: none; padding: 0; }
-    .cot-page { width: 100% !important; min-height: auto !important; box-shadow: none; margin: 0; overflow: visible; }
-    .cot-content { padding: 20mm 15mm 10mm !important; }
-    .cot-footer { background: #2d3a2d !important; padding: 12px 15mm !important; margin-top: 20px; }
+    .cot-page { width: 100% !important; height: 100vh; min-height: 297mm; box-shadow: none; margin: 0; overflow: visible; display: flex !important; flex-direction: column !important; }
+    .cot-content { padding: 20mm 15mm 10mm !important; flex: 1 !important; }
+    .cot-footer { background: #202820 !important; padding: 12px 15mm !important; margin-top: auto !important; flex-shrink: 0 !important; }
     .cot-footer span { color: #fff !important; }
-    .cot-table thead th { background: #2d5016 !important; color: #fff !important; font-size: 10px; padding: 8px 6px; }
+    .cot-table thead th { background: #3C5D3A !important; color: #fff !important; font-size: 10px; padding: 8px 6px; }
     .totals-row td { background: #f0f7eb !important; }
     .cot-table tbody td[contenteditable="true"]:focus { outline: none; }
     .cot-title-text { font-size: 14px; }
     .cot-table { font-size: 12px; }
     .cot-table tbody td { padding: 8px 6px; }
+    /* BLUM print overrides */
+    .cot-page.blum-pdf .cot-footer { background: #002E2B !important; }
+    .cot-page.blum-pdf .cot-table thead th { background: #002E2B !important; }
+    .cot-page.blum-pdf .totals-row td { background: #e6f2f1 !important; }
+    .cot-page.blum-pdf .cot-title-accent { background: #77CFC9 !important; }
+    .cot-page.blum-pdf .cot-table tbody tr:last-child td { border-bottom-color: #002E2B !important; }
+    .cot-page.blum-pdf .cot-desc-title { border-bottom-color: #002E2B !important; }
+    .cot-page.blum-pdf .cot-desc-box { background: #f4f9f9 !important; border-color: #d5e8e7 !important; }
+    .cot-page.blum-pdf .cot-validez { border-top-color: #d5e8e7 !important; color: #5a9e99 !important; }
   }
+
+  /* ========== BLUM UI MODE ========== */
+  .form-container.blum-mode h1 { color: #002E2B; }
+  .form-container.blum-mode .section-title { color: #002E2B; border-bottom-color: #d5e8e7; }
+  .form-container.blum-mode .form-group input:focus,
+  .form-container.blum-mode .form-group textarea:focus,
+  .form-container.blum-mode .form-group select:focus { border-color: #002E2B; box-shadow: 0 0 0 3px rgba(0,46,43,0.1); }
+  .form-container.blum-mode .uf-display { border-color: #77CFC9; background: #f0f8f7; }
+  .form-container.blum-mode .manual-uf button { background: #002E2B; }
+  .form-container.blum-mode .tip:hover { background: #002E2B; }
+  .form-container.blum-mode .tariff-badge { background: #d5e8e7; color: #002E2B; }
+  .form-container.blum-mode .tariff-tab.active { background: #002E2B; }
+  .form-container.blum-mode .tariff-table thead th { background: #002E2B; }
+  .form-container.blum-mode .tariff-table tbody td:last-child { color: #002E2B; }
+  .form-container.blum-mode .tariff-table tbody td input:focus { border-color: #002E2B; }
+  .form-container.blum-mode .tariff-result { background: #e6f2f1; }
+  .form-container.blum-mode .tariff-result .tr-category { color: #002E2B; }
+  .form-container.blum-mode .tariff-result .tr-price { color: #002E2B; }
+  .form-container.blum-mode .tariff-lev-row input:focus { border-color: #002E2B; }
+  .form-container.blum-mode .btn-apply-tariff { background: #002E2B; }
+  .form-container.blum-mode .btn-apply-tariff:hover { background: #004440; }
+  .form-container.blum-mode .campo-module-title { color: #002E2B; border-bottom-color: #d5e8e7; }
+  .form-container.blum-mode .calc-result { background: #e6f2f1; }
+  .form-container.blum-mode .calc-result .calc-value { color: #002E2B; }
+  .form-container.blum-mode .btn-add { background: #d5e8e7; color: #002E2B; }
+  .form-container.blum-mode .btn-add:hover { background: #b8d9d7; }
+  .form-container.blum-mode .servicio-item input[type="text"]:focus { border-color: #002E2B; }
+  .form-container.blum-mode .live-summary { background: #f0f8f7; border-color: #77CFC9; }
+  .form-container.blum-mode .live-summary h3 { color: #002E2B; }
+  .form-container.blum-mode .summary-item .s-value { color: #002E2B; }
+  .form-container.blum-mode .btn-generate { background: #002E2B; }
+  .form-container.blum-mode .btn-generate:hover { background: #004440; }
+  .form-container.blum-mode .logo-upload-group label.upload-btn { background: #d5e8e7; color: #002E2B; }
+  .form-container.blum-mode .logo-upload-group label.upload-btn:hover { background: #b8d9d7; }
+  .form-container.blum-mode .btn-pdf { color: #002E2B; }
+  .form-container.blum-mode .btn-pdf:hover { background: #e6f2f1; }
+  .form-container.blum-mode .tariff-table tbody tr.active-range { background: #e6f2f1; }
 </style>
 </head>
 <body>
 
 <div class="form-container" id="formContainer">
   <h1>Generador de Cotizaciones</h1>
-  <p class="subtitle">CYG Riego SPA — Baumsystem Control y Gestión de Riego</p>
+  <p class="subtitle" id="mainSubtitle">CYG Riego SPA — Baumsystem Control y Gestión de Riego</p>
 
   <!-- Indicadores económicos - ingreso manual -->
   <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:16px;">
@@ -283,27 +368,27 @@
       <div style="flex:1;">
         <div class="uf-label">Valor UF</div>
         <div style="display:flex; align-items:center; gap:8px; margin-top:6px;">
-          <span style="font-size:16px; font-weight:700; color:#2d5016;">$</span>
+          <span style="font-size:16px; font-weight:700; color:#3C5D3A;">$</span>
           <input type="number" id="manualUfInput" step="0.01" placeholder="Ej: 39934.00"
-            style="width:150px; padding:8px 10px; border:1px solid #c5ddb8; border-radius:6px; font-size:15px; font-weight:700; font-family:'Inter',sans-serif; color:#2d5016;"
+            style="width:150px; padding:8px 10px; border:1px solid #c5ddb8; border-radius:6px; font-size:15px; font-weight:700; font-family:'Inter',sans-serif; color:#3C5D3A;"
             oninput="setManualUf()">
         </div>
       </div>
       <a href="https://www.google.com/search?q=valor+uf+hoy+chile" target="_blank" rel="noopener"
-        style="font-size:11px; color:#2d5016; text-decoration:underline; white-space:nowrap;">Ver UF hoy</a>
+        style="font-size:11px; color:#3C5D3A; text-decoration:underline; white-space:nowrap;">Ver UF hoy</a>
     </div>
     <div class="uf-display" style="flex:1; min-width:200px;">
       <div style="flex:1;">
         <div class="uf-label">Valor USD (CLP)</div>
         <div style="display:flex; align-items:center; gap:8px; margin-top:6px;">
-          <span style="font-size:16px; font-weight:700; color:#2d5016;">$</span>
+          <span style="font-size:16px; font-weight:700; color:#3C5D3A;">$</span>
           <input type="number" id="manualUsdInput" step="0.01" placeholder="Ej: 950.00"
-            style="width:150px; padding:8px 10px; border:1px solid #c5ddb8; border-radius:6px; font-size:15px; font-weight:700; font-family:'Inter',sans-serif; color:#2d5016;"
+            style="width:150px; padding:8px 10px; border:1px solid #c5ddb8; border-radius:6px; font-size:15px; font-weight:700; font-family:'Inter',sans-serif; color:#3C5D3A;"
             oninput="setManualUsd()">
         </div>
       </div>
       <a href="https://www.google.com/finance/quote/USD-CLP" target="_blank" rel="noopener"
-        style="font-size:11px; color:#2d5016; text-decoration:underline; white-space:nowrap;">Ver USD hoy</a>
+        style="font-size:11px; color:#3C5D3A; text-decoration:underline; white-space:nowrap;">Ver USD hoy</a>
     </div>
   </div>
 
@@ -316,7 +401,7 @@
 
     <div class="tariff-tabs">
       <button class="tariff-tab active" onclick="setTariffType('baumsystem')">BaumSystem (CLP fijo)</button>
-      <button class="tariff-tab" onclick="setTariffType('baumapp')">BaumApp (USD/ha)</button>
+      <button class="tariff-tab" onclick="setTariffType('baumapp')">BLUM (USD/ha)</button>
     </div>
 
     <div class="tariff-body">
@@ -358,9 +443,9 @@
         <!-- BaumSystem table -->
         <div id="baumSystemTableWrap">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <span style="font-size:13px; font-weight:700; color:#1a3a6e;">Tabla BaumSystem</span>
+            <span style="font-size:13px; font-weight:700; color:#3C5D3A;">Tabla BaumSystem</span>
             <div style="display:flex; gap:6px;">
-              <button class="btn" style="font-size:11px; padding:4px 10px; background:#e0e7f5; color:#1a3a6e;" onclick="addBaumSystemRange()">+ Agregar</button>
+              <button class="btn" style="font-size:11px; padding:4px 10px; background:#e8ece5; color:#3C5D3A;" onclick="addBaumSystemRange()">+ Agregar</button>
               <button class="btn" style="font-size:11px; padding:4px 10px; background:#f5e0e0; color:#900;" onclick="restoreBaumSystem()">Restaurar</button>
             </div>
           </div>
@@ -373,9 +458,9 @@
         <!-- BaumApp table -->
         <div id="baumAppTableWrap" style="display:none;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <span style="font-size:13px; font-weight:700; color:#1a3a6e;">Tabla BaumApp</span>
+            <span style="font-size:13px; font-weight:700; color:#002E2B;">Tabla BLUM</span>
             <div style="display:flex; gap:6px;">
-              <button class="btn" style="font-size:11px; padding:4px 10px; background:#e0e7f5; color:#1a3a6e;" onclick="addBaumAppRange()">+ Agregar</button>
+              <button class="btn" style="font-size:11px; padding:4px 10px; background:#e8ece5; color:#3C5D3A;" onclick="addBaumAppRange()">+ Agregar</button>
               <button class="btn" style="font-size:11px; padding:4px 10px; background:#f5e0e0; color:#900;" onclick="restoreBaumApp()">Restaurar</button>
             </div>
           </div>
@@ -443,6 +528,11 @@
         <div class="s-value" id="sumLevant">$0</div>
         <div class="s-sub" id="sumLevantUF">0 UF</div>
       </div>
+      <div class="summary-item" id="sumVisitasItem" style="display:none;">
+        <div class="s-label" id="sumVisitasLabel">Visitas Mensuales + IVA</div>
+        <div class="s-value" id="sumVisitas">$0</div>
+        <div class="s-sub" id="sumVisitasSub">0 UF</div>
+      </div>
       <div class="summary-item">
         <div class="s-label">Servicio Mensual + IVA</div>
         <div class="s-value" id="sumMensual">$0</div>
@@ -475,7 +565,9 @@
     <div class="cot-footer" id="cotFooter">
       <span>WWW.BAUMSYSTEM.COM</span>
       <span class="sep">|</span>
-      <span>+(569) 9229663129</span>
+      <span>+569 92266329</span>
+      <span class="sep">|</span>
+      <span>+569 92718883</span>
     </div>
   </div>
 </div>
@@ -513,7 +605,7 @@
   let baumSystemRanges = JSON.parse(JSON.stringify(baumSystemDefaults));
   let baumAppRanges = JSON.parse(JSON.stringify(baumAppDefaults));
 
-  const serviciosDefault = [
+  const serviciosBaumSystem = [
     'Levantamiento y registro de activos de todo lo que compone los equipos de riego en caseta y terreno.',
     'Visita o auditoría general a todo el sistema y equipo de riego todos los meses.',
     'Visita equipo de supervisores durante el mes para apoyo del equipo humano y revisión del funcionamiento de los equipos de riego.',
@@ -526,6 +618,16 @@
     'Revisión de planos de riego existentes vs terreno real.',
     'Imágenes NDVI desde el software de BAUM.'
   ];
+
+  const serviciosBLUM = [
+    'Uso software para el control y gestión de los sistemas.',
+    'Apoyo telefónico y remoto 24/7.',
+    'Revisión de planos de riego existentes vs terreno real.',
+    'Imágenes NDVI desde el software de BLUM.',
+    'Reportes información de KPI mediciones y resolución de eventos.'
+  ];
+
+  const serviciosDefault = serviciosBaumSystem;
 
   // ========== INIT ==========
   document.addEventListener('DOMContentLoaded', () => {
@@ -572,13 +674,52 @@
   function setTariffType(type) {
     currentTariffType = type;
     document.querySelectorAll('.tariff-tab').forEach((t, i) => {
-      t.classList.toggle('active', (i === 0 && type === 'baumsystem') || (i === 1 && type === 'baumapp'));
+      const isActive = (i === 0 && type === 'baumsystem') || (i === 1 && type === 'baumapp');
+      t.classList.toggle('active', isActive);
+      t.classList.toggle('blum-active', isActive && i === 1);
     });
     document.getElementById('baumSystemTableWrap').style.display = type === 'baumsystem' ? '' : 'none';
     document.getElementById('baumAppTableWrap').style.display = type === 'baumapp' ? '' : 'none';
     document.getElementById('baumappConfig').style.display = type === 'baumapp' ? '' : 'none';
+    // Cambiar colores del panel y formulario completo según plataforma
+    const formContainer = document.getElementById('formContainer');
+    formContainer.classList.toggle('blum-mode', type === 'baumapp');
+    const panel = document.querySelector('.tariff-panel');
+    if (type === 'baumapp') {
+      panel.style.borderColor = '#77CFC9';
+      panel.querySelector('h2').style.color = '#002E2B';
+    } else {
+      panel.style.borderColor = '#d0d8e8';
+      panel.querySelector('h2').style.color = '#3C5D3A';
+    }
+    // Actualizar inline styles de indicadores económicos
+    const blumColor = '#002E2B';
+    const baumColor = '#3C5D3A';
+    const activeColor = type === 'baumapp' ? blumColor : baumColor;
+    const activeBorder = type === 'baumapp' ? '#77CFC9' : '#c5ddb8';
+    document.querySelectorAll('.uf-display span[style*="font-weight:700"]').forEach(s => { s.style.color = activeColor; });
+    document.querySelectorAll('.uf-display input[type="number"]').forEach(inp => { inp.style.color = activeColor; inp.style.borderColor = activeBorder; });
+    document.querySelectorAll('.uf-display a[style*="color"]').forEach(a => { a.style.color = activeColor; });
+    // Actualizar subtítulo
+    document.getElementById('mainSubtitle').textContent = type === 'baumapp'
+      ? 'Baum App SpA — BLUM Control y Gestión de Riego'
+      : 'CYG Riego SPA — Baumsystem Control y Gestión de Riego';
     updateBaumAppLabels();
     updateTariffPreview();
+    loadChecklistForPlatform();
+    // Ocultar visitas en BLUM, mostrar en BaumSystem + cambiar título levantamiento/onboarding
+    document.querySelectorAll('.campo-visitas-module').forEach(m => {
+      m.style.display = type === 'baumapp' ? 'none' : '';
+    });
+    // Al cambiar a BLUM, limpiar valores de visitas (son exclusivas de BaumSystem)
+    if (type === 'baumapp') {
+      document.querySelectorAll('.campo-visitas').forEach(i => { i.value = ''; });
+      document.querySelectorAll('.campo-visita-precio').forEach(i => { i.value = ''; });
+    }
+    document.querySelectorAll('.campo-lev-title').forEach(t => {
+      t.textContent = type === 'baumapp' ? 'Onboarding' : 'Levantamiento';
+    });
+    recalcAll();
   }
 
   function isBaumApp() { return currentTariffType === 'baumapp'; }
@@ -751,7 +892,7 @@
       </div>
       <div class="campo-card-modules">
         <div class="campo-module">
-          <div class="campo-module-title">Levantamiento</div>
+          <div class="campo-module-title campo-lev-title">${isBaumApp() ? 'Onboarding' : 'Levantamiento'}</div>
           <div class="form-group">
             <label>Precio por Ha ($)</label>
             <input type="number" class="campo-lev-ha" placeholder="5.200" oninput="recalcCampo(${id})">
@@ -763,6 +904,21 @@
           <div class="calc-result" style="margin-top:4px;">
             <span class="calc-label">+ IVA (19%):</span>
             <span class="calc-value" id="lev-iva-${id}">$0</span>
+          </div>
+        </div>
+        <div class="campo-module campo-visitas-module" ${isBaumApp() ? 'style="display:none;"' : ''}>
+          <div class="campo-module-title">Visitas</div>
+          <div class="form-group">
+            <label>Visitas / mes</label>
+            <input type="number" class="campo-visitas" min="0" max="12" value="" placeholder="0" oninput="recalcCampo(${id})">
+          </div>
+          <div class="form-group" style="margin-top:4px;">
+            <label>Precio por visita ($)</label>
+            <input type="number" class="campo-visita-precio" placeholder="404.250" oninput="recalcCampo(${id})">
+          </div>
+          <div class="calc-result" style="margin-top:4px;">
+            <span class="calc-label">Total mensual + IVA:</span>
+            <span class="calc-value" id="vis-total-${id}">$0</span>
           </div>
         </div>
         <div class="campo-module">
@@ -871,20 +1027,30 @@
       document.getElementById('serv-uf-' + id).textContent = servMensualUF + ' UF';
     }
 
+    // Visitas
+    const numVisitas = parseFloat(card.querySelector('.campo-visitas').value) || 0;
+    const precioVisita = parseFloat(card.querySelector('.campo-visita-precio').value) || 0;
+    const visTotalNeto = numVisitas * precioVisita;
+    const visTotalIva = Math.round(visTotalNeto * 1.19);
+    document.getElementById('vis-total-' + id).textContent = visTotalNeto > 0 ? '$' + formatNumber(visTotalIva) : '$0';
+
     recalcAll();
   }
 
   function recalcAll() {
     const cards = document.querySelectorAll('.campo-card');
-    let totalLev = 0, totalMensual = 0, totalHa = 0, count = 0;
+    let totalLev = 0, totalMensual = 0, totalVisitas = 0, totalHa = 0, count = 0;
     cards.forEach(card => {
       const ha = parseFloat(card.querySelector('.campo-ha').value) || 0;
       const levHa = parseFloat(card.querySelector('.campo-lev-ha').value) || 0;
       const servHa = parseFloat(card.querySelector('.campo-serv-ha').value) || 0;
+      const numVis = isBaumApp() ? 0 : (parseFloat(card.querySelector('.campo-visitas').value) || 0);
+      const precioVis = isBaumApp() ? 0 : (parseFloat(card.querySelector('.campo-visita-precio').value) || 0);
       if (ha > 0) {
         totalHa += ha;
         totalLev += Math.round(ha * levHa * 1.19);
         totalMensual += Math.round((ha * servHa) / 12);
+        totalVisitas += Math.round(numVis * precioVis * 1.19);
         count++;
       }
     });
@@ -893,10 +1059,26 @@
       summary.style.display = 'block';
       document.getElementById('sumLevant').textContent = '$' + formatNumber(totalLev);
       document.getElementById('sumLevantUF').textContent = ufActual ? (Math.round((totalLev / ufActual) * 10) / 10) + ' UF' : '— UF';
-      document.getElementById('sumMensual').textContent = '$' + formatNumber(totalMensual);
-      document.getElementById('sumMensualUF').textContent = ufActual ? (Math.round((totalMensual / ufActual) * 10) / 10) + ' UF' : '— UF';
+
+      const totalMensualIva = Math.round(totalMensual * 1.19);
+      document.getElementById('sumMensual').textContent = '$' + formatNumber(totalMensualIva);
+      document.getElementById('sumMensualUF').textContent = ufActual ? (Math.round((totalMensualIva / ufActual) * 10) / 10) + ' UF' : '— UF';
       document.getElementById('sumHa').textContent = formatNumber(totalHa) + ' Ha';
       document.getElementById('sumCampos').textContent = count + (count === 1 ? ' campo' : ' campos');
+
+      // Visitas en resumen
+      const visitasItem = document.getElementById('sumVisitasItem');
+      if (totalVisitas > 0) {
+        visitasItem.style.display = '';
+        document.getElementById('sumVisitasLabel').textContent = 'Visitas Mensuales + IVA';
+        document.getElementById('sumVisitas').textContent = '$' + formatNumber(totalVisitas);
+        document.getElementById('sumVisitas').style.color = '#3C5D3A';
+        document.getElementById('sumVisitasSub').textContent = ufActual
+          ? (Math.round((totalVisitas / ufActual) * 10) / 10) + ' UF'
+          : '— UF';
+      } else {
+        visitasItem.style.display = 'none';
+      }
     } else {
       summary.style.display = 'none';
     }
@@ -924,6 +1106,19 @@
     const d = new Date(dateStr + 'T12:00:00');
     const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
     return d.getDate() + ' ' + meses[d.getMonth()] + ' ' + d.getFullYear();
+  }
+
+  let _lastPlatform = 'baumsystem';
+  function loadChecklistForPlatform() {
+    const newPlatform = isBaumApp() ? 'baumapp' : 'baumsystem';
+    if (newPlatform === _lastPlatform) return;
+    _lastPlatform = newPlatform;
+    // Limpiar servicios y cargar los de la plataforma
+    const container = document.getElementById('serviciosContainer');
+    container.innerHTML = '';
+    servCount = 0;
+    const lista = isBaumApp() ? serviciosBLUM : serviciosBaumSystem;
+    lista.forEach(s => addServicio(s));
   }
 
   // ========== CORRELATIVO ==========
@@ -959,6 +1154,8 @@
       const ha = parseFloat(card.querySelector('.campo-ha').value) || 0;
       const levHa = parseFloat(card.querySelector('.campo-lev-ha').value) || 0;
       const servHa = parseFloat(card.querySelector('.campo-serv-ha').value) || 0;
+      const numVisitas = esBaumApp ? 0 : (parseFloat(card.querySelector('.campo-visitas').value) || 0);
+      const precioVisita = esBaumApp ? 0 : (parseFloat(card.querySelector('.campo-visita-precio').value) || 0);
       if (nombre && ha > 0) {
         let levNeto, levIva, levCol6;
         if (esBaumApp && levMoneda === 'USD') {
@@ -981,7 +1178,7 @@
           servCol6 = ufActual ? (Math.round((servMensual / ufActual) * 10) / 10) + ' UF' : '—';
         }
 
-        campos.push({ nombre, ha, levHa, levNeto, levIva, levCol6, servHa, servAnual, servMensual, servCol6 });
+        campos.push({ nombre, ha, levHa, levNeto, levIva, levCol6, servHa, servAnual, servMensual, servCol6, numVisitas, precioVisita });
       }
     });
 
@@ -992,22 +1189,6 @@
 
     const totalHa = campos.reduce((s, c) => s + c.ha, 0);
 
-    // Ajustar visitas según rango BaumSystem: 1-69 ha = 1 visita, resto = 2 visitas
-    if (!isBaumApp()) {
-      const numVisitas = totalHa <= 69 ? 1 : 2;
-      for (let i = 0; i < servicios.length; i++) {
-        if (servicios[i].match(/visita.*auditor[ií]a.*general/i)) {
-          servicios[i] = numVisitas === 1
-            ? 'Visita o auditoría general a todo el sistema y equipo de riego (1 visita mensual).'
-            : 'Visita o auditoría general a todo el sistema y equipo de riego (2 visitas mensuales).';
-        }
-        if (servicios[i].match(/visita.*equipo.*supervisor/i)) {
-          servicios[i] = numVisitas === 1
-            ? 'Visita equipo de supervisores para apoyo del equipo humano y revisión del funcionamiento de los equipos de riego (1 visita mensual).'
-            : 'Visita equipo de supervisores durante el mes para apoyo del equipo humano y revisión del funcionamiento de los equipos de riego (2 visitas mensuales).';
-        }
-      }
-    }
     const totalLevIva = campos.reduce((s, c) => s + c.levIva, 0);
     const totalAnual = campos.reduce((s, c) => s + c.servAnual, 0);
     const totalMensual = campos.reduce((s, c) => s + c.servMensual, 0);
@@ -1033,6 +1214,41 @@
     const levCol6Header = (esBaumApp && levMoneda === 'USD') ? 'TOTAL USD' : 'UF + IVA';
     const levPrecioHeader = (esBaumApp && levMoneda === 'USD') ? 'PRECIO/Ha (USD)' : 'PRECIO/Ha';
     const servCol6Header = (esBaumApp && servMoneda === 'USD') ? 'MENSUAL USD + IVA' : 'VALOR MENSUAL UF + IVA';
+
+    // Check which sections have data
+    const hasLev = campos.some(c => c.levHa > 0);
+    const hasVisitas = campos.some(c => c.numVisitas > 0 && c.precioVisita > 0);
+    const hasServicio = campos.some(c => c.servHa > 0);
+
+    // Visitas HTML
+    let visitasHtml = '';
+    if (hasVisitas) {
+      const visitasCampos = campos.filter(c => c.numVisitas > 0 && c.precioVisita > 0);
+      const totalVisitasMensualIva = visitasCampos.reduce((s, c) => s + Math.round(c.numVisitas * c.precioVisita * 1.19), 0);
+      const totalVisitasUf = ufActual ? (Math.round((totalVisitasMensualIva / ufActual) * 10) / 10) + ' UF' : '—';
+      const visitasRows = visitasCampos.map(c => {
+        const vTotal = c.numVisitas * c.precioVisita;
+        const vTotalIva = Math.round(vTotal * 1.19);
+        const vUf = ufActual ? (Math.round((vTotalIva / ufActual) * 10) / 10) + ' UF' : '—';
+        return '<tr>' +
+          '<td contenteditable="true">' + c.nombre + '</td>' +
+          '<td contenteditable="true" style="text-align:center;">' + c.numVisitas + '</td>' +
+          '<td contenteditable="true" style="text-align:center;">$' + formatNumber(c.precioVisita) + '</td>' +
+          '<td contenteditable="true" style="text-align:center;">$' + formatNumber(vTotal) + '</td>' +
+          '<td contenteditable="true" style="text-align:center;"><strong>$' + formatNumber(vTotalIva) + '</strong></td>' +
+          '<td contenteditable="true" style="text-align:center;">' + vUf + '</td>' +
+          '</tr>';
+      }).join('');
+      const visitasTotalsRow = visitasCampos.length > 1
+        ? '<tr class="totals-row"><td><strong>TOTAL</strong></td><td>—</td><td>—</td><td>—</td>' +
+          '<td contenteditable="true"><strong>$' + formatNumber(totalVisitasMensualIva) + '</strong></td>' +
+          '<td contenteditable="true"><strong>' + totalVisitasUf + '</strong></td></tr>'
+        : '';
+      visitasHtml = '<div class="cot-section-title">Visitas Mensuales</div>' +
+        '<table class="cot-table">' +
+        '<thead><tr><th>CAMPO</th><th>VISITAS/MES</th><th>PRECIO/VISITA</th><th>TOTAL MENSUAL</th><th>TOTAL + IVA</th><th>UF + IVA</th></tr></thead>' +
+        '<tbody>' + visitasRows + visitasTotalsRow + '</tbody></table>';
+    }
 
     const logoSrc = logoDataUrl || DEFAULT_LOGO;
     const logoHtml = `<div class="cot-logo"><img src="${logoSrc}" alt="Baum"></div>`;
@@ -1060,13 +1276,13 @@
           <p><strong>Fecha:</strong> ${formatFecha(cotDate)}</p>
         </div>
         <div class="cot-client-right">
-          <div class="company">CYG RIEGO SPA</div>
-          <div>Baumsystem Control y</div>
+          <div class="company">${esBaumApp ? 'BAUM APP SPA' : 'CYG RIEGO SPA'}</div>
+          <div>${esBaumApp ? 'BLUM — Control y' : 'Baumsystem Control y'}</div>
           <div>Gestión de riego</div>
         </div>
       </div>
       <div class="edit-hint">Haz clic en cualquier valor de las tablas para editarlo antes de imprimir</div>
-      <div class="cot-section-title">Levantamiento</div>
+      ${hasLev ? `<div class="cot-section-title">${esBaumApp ? 'Onboarding' : 'Levantamiento'}</div>
       <table class="cot-table">
         <thead><tr><th>CAMPO</th><th>SUPERFICIE (Ha)</th><th>${levPrecioHeader}</th><th>NETO</th><th>TOTAL + IVA</th><th>${levCol6Header}</th></tr></thead>
         <tbody>
@@ -1085,8 +1301,9 @@
             <td contenteditable="true"><strong>${totalLevCol6}</strong></td>
           </tr>` : ''}
         </tbody>
-      </table>
-      <div class="cot-section-title">Servicio ${esBaumApp ? 'BaumApp' : 'Baum'} (Has/año)</div>
+      </table>` : ''}
+      ${visitasHtml}
+      ${hasServicio ? `<div class="cot-section-title">Servicio ${esBaumApp ? 'BLUM' : 'Baum'} (Has/año)</div>
       <table class="cot-table">
         <thead><tr><th>CAMPO</th><th>SUPERFICIE (Ha)</th><th>VALOR Ha/AÑO</th><th>VALOR ANUAL</th><th>VALOR MENSUAL + IVA</th><th>${servCol6Header}</th></tr></thead>
         <tbody>
@@ -1106,14 +1323,44 @@
             <td contenteditable="true"><strong>${totalServCol6}</strong></td>
           </tr>` : ''}
         </tbody>
-      </table>
+      </table>` : ''}
       <div class="cot-uf-note">${notaIndicadores}</div>
-      <div class="cot-desc-title">DESCRIPCIÓN DEL SERVICIO</div>
-      <ul class="cot-desc-list">${servicios.map(s => `<li>${s}</li>`).join('')}</ul>
-      <div class="cot-validez">Cotización Válida por ${cotValidez} días desde la fecha.</div>
+      <div class="cot-desc-box">
+        <div class="cot-desc-title">DESCRIPCIÓN DEL SERVICIO</div>
+        <ul class="cot-desc-list">${servicios.map(s => `<li>${s}</li>`).join('')}</ul>
+        <div class="cot-validez">Cotización Válida por ${cotValidez} días desde la fecha.</div>
+      </div>
     `;
 
     document.getElementById('cotContent').innerHTML = html;
+    // Footer según plataforma
+    const footerEl = document.getElementById('cotFooter');
+    if (esBaumApp) {
+      footerEl.style.background = '#002E2B';
+      footerEl.innerHTML = '<span>WWW.BLUMAPPS.COM</span><span class="sep">|</span><span>+569 79685581</span>';
+    } else {
+      footerEl.style.background = '#202820';
+      footerEl.innerHTML = '<span>WWW.BAUMSYSTEM.COM</span><span class="sep">|</span><span>+569 92266329</span><span class="sep">|</span><span>+569 92718883</span>';
+    }
+    // Clase para print CSS según plataforma
+    const cotPage = document.getElementById('cotPage');
+    cotPage.classList.toggle('blum-pdf', esBaumApp);
+    // Colores del PDF según plataforma
+    if (esBaumApp) {
+      const blumPrimary = '#002E2B';
+      const blumAccent = '#77CFC9';
+      document.querySelectorAll('.cot-table thead th').forEach(th => { th.style.background = blumPrimary; });
+      document.querySelectorAll('.cot-table tbody tr:last-child td').forEach(td => { td.style.borderBottomColor = blumPrimary; });
+      document.querySelector('.cot-title-accent').style.background = blumAccent;
+      document.querySelector('.company').style.color = blumPrimary;
+      const descTitle = document.querySelector('.cot-desc-title');
+      if (descTitle) { descTitle.style.borderBottomColor = blumPrimary; }
+      const descBox = document.querySelector('.cot-desc-box');
+      if (descBox) { descBox.style.background = '#f4f9f9'; descBox.style.borderColor = '#d5e8e7'; }
+      document.querySelectorAll('.totals-row td').forEach(td => { td.style.background = '#e6f2f1'; });
+      const validez = document.querySelector('.cot-validez');
+      if (validez) { validez.style.color = '#5a9e99'; validez.style.borderTopColor = '#d5e8e7'; }
+    }
     document.getElementById('pdfOverlay').classList.add('active');
   }
 
