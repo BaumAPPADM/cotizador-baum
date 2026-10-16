@@ -354,6 +354,35 @@
   .form-container.blum-mode .btn-pdf { color: #002E2B; }
   .form-container.blum-mode .btn-pdf:hover { background: #e6f2f1; }
   .form-container.blum-mode .tariff-table tbody tr.active-range { background: #e6f2f1; }
+
+  /* ========== SWITCH MONEDA BLUM ========== */
+  .moneda-switch-wrap {
+    display: none; margin-bottom: 20px;
+    background: #f0f8f7; border: 1px solid #77CFC9; border-radius: 10px; padding: 14px 20px;
+  }
+  .moneda-switch-wrap.visible { display: block; }
+  .moneda-switch-header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 0;
+  }
+  .moneda-switch-header .moneda-label {
+    font-size: 13px; font-weight: 600; color: #002E2B;
+  }
+  .moneda-switch-header .moneda-sub {
+    font-size: 11px; color: #5a9e99; font-weight: 400;
+  }
+  .moneda-toggle {
+    display: inline-flex; border-radius: 8px; overflow: hidden; border: 1px solid #77CFC9;
+    background: #fff;
+  }
+  .moneda-toggle button {
+    padding: 8px 20px; font-size: 13px; font-weight: 600; border: none;
+    background: #fff; color: #555; cursor: pointer; font-family: 'Inter', sans-serif;
+    transition: all 0.2s;
+  }
+  .moneda-toggle button.active {
+    background: #002E2B; color: #fff;
+  }
+  .moneda-toggle button:not(.active):hover { background: #e6f2f1; }
 </style>
 </head>
 <body>
@@ -389,6 +418,20 @@
       </div>
       <a href="https://www.google.com/finance/quote/USD-CLP" target="_blank" rel="noopener"
         style="font-size:11px; color:#3C5D3A; text-decoration:underline; white-space:nowrap;">Ver USD hoy</a>
+    </div>
+  </div>
+
+  <!-- ========== SWITCH MONEDA BLUM ========== -->
+  <div class="moneda-switch-wrap" id="monedaSwitchWrap">
+    <div class="moneda-switch-header">
+      <div>
+        <span class="moneda-label">Moneda de cotización</span><br>
+        <span class="moneda-sub">Clientes internacionales: USD — Clientes Chile: UF</span>
+      </div>
+      <div class="moneda-toggle" id="monedaToggle">
+        <button class="active" onclick="setBlumMoneda('UF')">UF (Chile)</button>
+        <button onclick="setBlumMoneda('USD')">USD (Internacional)</button>
+      </div>
     </div>
   </div>
 
@@ -719,12 +762,51 @@
     document.querySelectorAll('.campo-lev-title').forEach(t => {
       t.textContent = type === 'baumapp' ? 'Onboarding' : 'Levantamiento';
     });
+    // Mostrar/ocultar switch de moneda BLUM
+    document.getElementById('monedaSwitchWrap').classList.toggle('visible', type === 'baumapp');
+    // Actualizar labels de campos según moneda actual
+    updateCampoLabelsMoneda();
     recalcAll();
   }
 
   function isBaumApp() { return currentTariffType === 'baumapp'; }
   function getBaumAppLevMoneda() { return document.getElementById('baumappLevMoneda')?.value || 'CLP'; }
   function getBaumAppServMoneda() { return document.getElementById('baumappServMoneda')?.value || 'UF'; }
+
+  function setBlumMoneda(moneda) {
+    // moneda: 'UF' o 'USD'
+    const btns = document.querySelectorAll('#monedaToggle button');
+    btns.forEach(b => b.classList.remove('active'));
+    if (moneda === 'USD') {
+      btns[1].classList.add('active');
+      document.getElementById('baumappLevMoneda').value = 'USD';
+      document.getElementById('baumappServMoneda').value = 'USD';
+    } else {
+      btns[0].classList.add('active');
+      document.getElementById('baumappLevMoneda').value = 'CLP';
+      document.getElementById('baumappServMoneda').value = 'UF';
+    }
+    updateCampoLabelsMoneda();
+    updateBaumAppLabels();
+    recalcAll();
+  }
+
+  function updateCampoLabelsMoneda() {
+    if (!isBaumApp()) return;
+    const servMoneda = getBaumAppServMoneda();
+    const levMoneda = getBaumAppLevMoneda();
+    // Actualizar label del último calc-result en cada campo (UF o USD)
+    document.querySelectorAll('.campo-card').forEach(card => {
+      const ufLabel = card.querySelector('.campo-serv-uf-label');
+      if (ufLabel) {
+        ufLabel.textContent = servMoneda === 'USD' ? 'Mensual USD:' : 'Mensual UF:';
+      }
+      const levLabel = card.querySelector('.campo-lev-ha')?.parentElement?.querySelector('label');
+      if (levLabel) {
+        levLabel.textContent = levMoneda === 'USD' ? 'Precio por Ha (USD)' : 'Precio por Ha ($)';
+      }
+    });
+  }
 
   function updateBaumAppLabels() {
     // Actualizar labels de los campos según moneda seleccionada si es BaumApp
@@ -936,7 +1018,7 @@
             <span class="calc-value" id="serv-mensual-${id}">$0</span>
           </div>
           <div class="calc-result" style="margin-top:4px;">
-            <span class="calc-label">Mensual UF:</span>
+            <span class="calc-label campo-serv-uf-label">Mensual UF:</span>
             <span class="calc-value" id="serv-uf-${id}">0 UF</span>
           </div>
         </div>
@@ -1058,11 +1140,18 @@
     if (totalHa > 0) {
       summary.style.display = 'block';
       document.getElementById('sumLevant').textContent = '$' + formatNumber(totalLev);
-      document.getElementById('sumLevantUF').textContent = ufActual ? (Math.round((totalLev / ufActual) * 10) / 10) + ' UF' : '— UF';
-
       const totalMensualIva = Math.round(totalMensual * 1.19);
       document.getElementById('sumMensual').textContent = '$' + formatNumber(totalMensualIva);
-      document.getElementById('sumMensualUF').textContent = ufActual ? (Math.round((totalMensualIva / ufActual) * 10) / 10) + ' UF' : '— UF';
+
+      // Resumen en UF o USD según moneda BLUM
+      if (isBaumApp() && getBaumAppServMoneda() === 'USD') {
+        const rate = usdActual || parseFloat(document.getElementById('tariffUsdClp').value) || 950;
+        document.getElementById('sumLevantUF').textContent = 'USD ' + (Math.round((totalLev / rate) * 10) / 10);
+        document.getElementById('sumMensualUF').textContent = 'USD ' + (Math.round((totalMensualIva / rate) * 10) / 10);
+      } else {
+        document.getElementById('sumLevantUF').textContent = ufActual ? (Math.round((totalLev / ufActual) * 10) / 10) + ' UF' : '— UF';
+        document.getElementById('sumMensualUF').textContent = ufActual ? (Math.round((totalMensualIva / ufActual) * 10) / 10) + ' UF' : '— UF';
+      }
       document.getElementById('sumHa').textContent = formatNumber(totalHa) + ' Ha';
       document.getElementById('sumCampos').textContent = count + (count === 1 ? ' campo' : ' campos');
 
