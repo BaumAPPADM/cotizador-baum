@@ -425,8 +425,8 @@
   <div class="moneda-switch-wrap" id="monedaSwitchWrap">
     <div class="moneda-switch-header">
       <div>
-        <span class="moneda-label">Moneda de cotización</span><br>
-        <span class="moneda-sub">Clientes internacionales: USD — Clientes Chile: UF</span>
+        <span class="moneda-label">Moneda servicio anual</span><br>
+        <span class="moneda-sub">Chile: UF — Internacional: USD</span>
       </div>
       <div class="moneda-toggle" id="monedaToggle">
         <button class="active" onclick="setBlumMoneda('UF')">UF (Chile)</button>
@@ -774,16 +774,14 @@
   function getBaumAppServMoneda() { return document.getElementById('baumappServMoneda')?.value || 'UF'; }
 
   function setBlumMoneda(moneda) {
-    // moneda: 'UF' o 'USD'
+    // moneda: 'UF' o 'USD' — solo afecta servicio anual (no levantamiento)
     const btns = document.querySelectorAll('#monedaToggle button');
     btns.forEach(b => b.classList.remove('active'));
     if (moneda === 'USD') {
       btns[1].classList.add('active');
-      document.getElementById('baumappLevMoneda').value = 'USD';
       document.getElementById('baumappServMoneda').value = 'USD';
     } else {
       btns[0].classList.add('active');
-      document.getElementById('baumappLevMoneda').value = 'CLP';
       document.getElementById('baumappServMoneda').value = 'UF';
     }
     updateCampoLabelsMoneda();
