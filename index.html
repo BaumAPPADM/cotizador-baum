@@ -1350,12 +1350,14 @@
 
     // Nota de indicadores
     let notaIndicadores;
+    const ufFechaClean = ufFecha === 'Ingresado manualmente' ? '' : ` (${ufFecha})`;
+    const usdFechaClean = usdFecha === 'Ingresado manualmente' ? '' : ` (${usdFecha})`;
     if (servEnUsd) {
-      notaIndicadores = `*Tipo de cambio USD $${formatNumber(usdActual)} (${usdFecha})`;
+      notaIndicadores = `*Tipo de cambio USD $${formatNumber(usdActual)}${usdFechaClean}`;
     } else {
-      notaIndicadores = `*Valor UF calculado $${formatNumber(ufActual)} (${ufFecha})`;
+      notaIndicadores = `*Valor UF calculado $${formatNumber(ufActual)}${ufFechaClean}`;
       if (esBaumApp) {
-        notaIndicadores += ` | USD $${formatNumber(usdActual)} (${usdFecha})`;
+        notaIndicadores += ` | USD $${formatNumber(usdActual)}${usdFechaClean}`;
       }
     }
 
@@ -1377,8 +1379,7 @@
         </div>
         <div class="cot-client-right">
           <div class="company">${esBaumApp ? 'BAUM APP SPA' : 'CYG RIEGO SPA'}</div>
-          <div>${esBaumApp ? 'BLUM — Control y' : 'Baumsystem Control y'}</div>
-          <div>Gestión de riego</div>
+          <div>${esBaumApp ? 'BLUM — Control y Gestión de riego' : 'Baumsystem Control y Gestión de riego'}</div>
         </div>
       </div>
       <div class="edit-hint">Haz clic en cualquier valor de las tablas para editarlo antes de imprimir</div>
